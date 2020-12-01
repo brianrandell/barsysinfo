@@ -26,7 +26,12 @@ namespace barsysinfo
             Console.WriteLine($"Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
 
             bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool IsMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
             OutputWindowsSpecifics(IsWindows);
+            OutputMacOsSpecifics(IsMacOS);
+            OutputLinuxSpecifics(IsLinux);
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to exit program.");
@@ -74,5 +79,74 @@ namespace barsysinfo
                 }
             }
         }
+
+        private static void OutputLinuxSpecifics(bool isLinux)
+        {
+            if (isLinux)
+            {
+                Console.WriteLine(" ");
+                Console.WriteLine("Getting Linux specific system information ...");
+                Console.WriteLine(" ");
+
+                var nestedArgs = "screenfetch";
+                var process = new Process()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "/bin/bash",
+                        Arguments = $"-c \"{nestedArgs}\"",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                try
+                {
+                    process.Start();
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    Console.WriteLine(output);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains("screenfetch: command not found"))
+                    {
+                        Console.WriteLine("You need to install ScreenFetch for more details.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        private static void OutputMacOsSpecifics(bool IsMacOS)
+        {
+            if (IsMacOS)
+            {
+                Console.WriteLine(" ");
+                Console.WriteLine("Getting macOS specific system information ...");
+
+                var nestedArgs = "system_profiler SPSoftwareDataType";
+                var process = new Process()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "/bin/bash",
+                        Arguments = $"-c \"{nestedArgs}\"",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                Console.WriteLine(output);
+            }
+        }
+
     }
 }
