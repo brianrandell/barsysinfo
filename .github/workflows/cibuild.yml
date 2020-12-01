@@ -18,8 +18,7 @@ jobs:
         dotnet-version: 3.1.404
     
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore ./src/barsysinfo/barsysinfo.sln
     
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-      
+      run: dotnet build ./src/barsysinfo/barsysinfo.sln --configuration Release --no-restore
